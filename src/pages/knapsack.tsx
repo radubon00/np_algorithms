@@ -1,51 +1,92 @@
 // src/pages/knapsack.tsx
 import { useState } from "react";
 import Navbar from "../components/navbar.tsx";
-import { heuristicKnapsack } from "../algorithms/knapsack";
+import { heuristicKnapsack, type KnapsackItem } from "../algorithms/knapsack";
 
-type Item = {
-  id: number;
-  name: string;
-  weight: number;
-  value: number;
+type KnapsackResult = {
+  selectedItems: { name: string; weight: number; value: number }[];
+  totalValue: number;
+  remainingCapacity: number;
+  alphaUsed: number | null;
 };
+
+type Item = KnapsackItem & {
+  id: number;
+};
+
+
+// simple colour palette for the segments
+const SEGMENT_COLORS = [
+  "#6366F1", // indigo
+  "#06B6D4", // cyan
+  "#22C55E", // green
+  "#F97316", // orange
+  "#E11D48", // pink
+  "#A855F7", // purple
+];
+
+  function getNextName(currentItems: Item[]): string {
+  const usedNames = new Set(currentItems.map((it) => it.name));
+
+  // Try letters A–Z
+  for (let code = 65; code <= 90; code++) {
+    const candidate = String.fromCharCode(code); // 'A'..'Z'
+    if (!usedNames.has(candidate)) {
+      return candidate;
+    }
+  }
+
+  // Fallback: if all 26 are used, just reuse based on length
+  return String.fromCharCode(65 + (currentItems.length % 26));
+}
+
 
 export default function KnapsackPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [weightInput, setWeightInput] = useState("");
   const [valueInput, setValueInput] = useState("");
   const [capacity, setCapacity] = useState("");
+  const [result, setResult] = useState<KnapsackResult | null>(null);
+  const nextName = getNextName(items);
 
-  // For now we’ll keep this empty – later you’ll plug in your JS knapsack algorithm
+
 const handleRunAlgorithm = () => {
   const cap = Number(capacity);
-  if (!cap || cap <= 0) return;
+  if (!cap || cap <= 0 || items.length === 0) return;
 
-  const result = heuristicKnapsack(items, cap);
+    // strip `id` before passing to the algorithm (it doesn’t care)
+    const algoItems: KnapsackItem[] = items.map(({ id, ...rest }) => rest);
+    const algoResult = heuristicKnapsack(algoItems, cap);
 
-  // later you can store this in state to visualize
-  console.log("Best knapsack:", result.selectedItems);
-  console.log("Total value:", result.totalValue);
-  console.log("Remaining capacity:", result.remainingCapacity);
-  console.log("Alpha used:", result.alphaUsed);
+
+  setResult(algoResult);
+
+  // still log to console if you want
+  console.log("Best knapsack:", algoResult.selectedItems);
+  console.log("Total value:", algoResult.totalValue);
+  console.log("Remaining capacity:", algoResult.remainingCapacity);
+  console.log("Alpha used:", algoResult.alphaUsed);
 };
 
-  const nextName = String.fromCharCode(65 + (items.length % 26)); // A, B, C...
 
   const handleAddItem = () => {
     const weight = Number(weightInput);
     const value = Number(valueInput);
-
     if (!weight || !value || weight <= 0 || value <= 0) return;
 
-    const newItem: Item = {
-      id: Date.now(),
-      name: nextName,
-      weight,
-      value,
-    };
+    setItems((prev) => {
+      const name = getNextName(prev);
+      return [
+        ...prev,
+        {
+          id: Date.now(),
+          name,
+          weight,
+          value,
+        },
+      ];
+    });
 
-    setItems((prev) => [...prev, newItem]);
     setWeightInput("");
     setValueInput("");
   };
@@ -54,9 +95,13 @@ const handleRunAlgorithm = () => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleClearItems = () => {
-    setItems([]);
-  };
+const handleClearItems = () => {
+  setItems([]);
+  setCapacity("");     // optional: also clear capacity input
+  setResult(null);     // ✅ reset visualization to default state
+};
+
+
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -177,12 +222,176 @@ const handleRunAlgorithm = () => {
             </button>
           </div>
         </section>
-
         {/* === RIGHT VISUALIZATION PANEL === */}
         <section className="hidden md:flex flex-1 items-center justify-center">
-          <div className="w-full h-[480px] rounded-3xl border border-dashed border-slate-300 bg-white shadow-sm flex items-center justify-center text-sm text-slate-500 px-6 text-center">
-            Visualization area. Later we’ll draw the knapsack, show selected vs
-            unselected items, total value, and remaining capacity.
+          <div className="w-full h-[480px] rounded-3xl border border-slate-200 bg-white shadow-sm px-8 py-6 flex flex-col gap-4">
+            {!result ? (
+              <div className="flex-1 flex items-center justify-center text-sm text-slate-500 text-center">
+                Run the algorithm to see the knapsack visualization.
+              </div>
+            ) : (
+              <>
+                {/* Header / stats */}
+                <header className="text-sm text-slate-700">
+                  <h2 className="text-xl font-semibold text-slate-900 mb-1">
+                    Knapsack result
+                  </h2>
+                  {(() => {
+                    const usedWeight = result.selectedItems.reduce(
+                      (sum, it) => sum + it.weight,
+                      0
+                    );
+                    const capacityTotal = usedWeight + result.remainingCapacity;
+
+                    return (
+                      <p>
+                        <span className="font-medium text-emerald-600">
+                          Total value: {result.totalValue}
+                        </span>
+                        {" · "}
+                        Capacity used:{" "}
+                        <span className="font-medium">
+                          {usedWeight} / {capacityTotal}
+                        </span>
+                        {" · "}
+                        Remaining:{" "}
+                        <span className="font-medium">
+                          {result.remainingCapacity}
+                        </span>
+                        {result.alphaUsed !== null && (
+                          <>
+                            {" · "}α used:{" "}
+                            <span className="font-mono">
+                              {result.alphaUsed.toFixed(1)}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    );
+                  })()}
+                </header>
+
+                <div className="flex-1 flex gap-10 items-center">
+                  {/* Bucket */}
+                  {(() => {
+                    const usedWeight = result.selectedItems.reduce(
+                      (sum, it) => sum + it.weight,
+                      0
+                    );
+                    const capacityTotal = usedWeight + result.remainingCapacity || 1;
+
+                    // bigger items at the bottom to look nicer
+                    const itemsSorted = [...result.selectedItems].sort(
+                      (a, b) => b.weight - a.weight
+                    );
+
+                    return (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="relative h-80 w-48 border-[3px] border-slate-700 rounded-b-3xl rounded-t-md overflow-hidden bg-slate-100">
+                          {/* stacked from bottom to top */}
+                          <div className="absolute inset-0 flex flex-col">
+                            {/* Empty / free space */}
+                            {result.remainingCapacity > 0 && (
+                              <div
+                                className="w-full bg-slate-200/80 border-t border-slate-300 flex items-center justify-center text-sm font-medium text-slate-700"
+                                style={{
+                                  height: `${
+                                    (result.remainingCapacity / capacityTotal) * 100
+                                  }%`,
+                                }}
+                              >
+                                Empty
+                              </div>
+                            )}
+
+                            {/* Item segments */}
+                            {itemsSorted.map((item, idx) => (
+                              <div
+                                key={`${item.name}-${idx}`}  // ✅ use name+index instead of item.id
+                                className="w-full border-t border-white/40 flex items-center justify-center text-xl font-semibold text-white"
+                                style={{
+                                  height: `${
+                                    (item.weight / capacityTotal) * 100
+                                  }%`,
+                                  backgroundColor:
+                                    SEGMENT_COLORS[idx % SEGMENT_COLORS.length],
+                                }}
+                              >
+                                {item.name}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Chips list: inside vs outside */}
+                  <div className="flex-1 flex flex-col gap-3 text-sm">
+                    <div>
+                      <h3 className="font-medium text-slate-800 mb-2">
+                        Items inside the bag
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {result.selectedItems.length === 0 ? (
+                          <span className="text-xs text-slate-500">
+                            No items selected.
+                          </span>
+                        ) : (
+                          result.selectedItems.map((it) => (
+                            <span
+                              key={it.name}
+                              className="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs"
+                            >
+                              <span className="font-semibold mr-1">{it.name}</span>
+                              <span className="text-slate-600">
+                                w:{it.weight} · v:{it.value}
+                              </span>
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-medium text-slate-800 mb-2">
+                        Items outside the bag
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {(() => {
+                          const selectedNames = new Set(
+                            result.selectedItems.map((it) => it.name)
+                          );
+                          const outside = items.filter(
+                            (it) => !selectedNames.has(it.name)
+                          );
+
+                          if (outside.length === 0) {
+                            return (
+                              <span className="text-xs text-slate-500">
+                                All current items are inside the knapsack.
+                              </span>
+                            );
+                          }
+
+                          return outside.map((it) => (
+                            <span
+                              key={it.id}
+                              className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs"
+                            >
+                              <span className="font-semibold mr-1">{it.name}</span>
+                              <span className="text-slate-600">
+                                w:{it.weight} · v:{it.value}
+                              </span>
+                            </span>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </section>
       </main>
