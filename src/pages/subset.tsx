@@ -237,13 +237,28 @@ const handleClearItems = () => {
                             Solution #{idx + 1}
                           </div>
 
+                          {/* Print array solution*/}
                           <div className="text-xs text-slate-600 mb-1">
-                            Boolean path: <span className="font-mono">{JSON.stringify(sol)}</span>
+                            Boolean path:{" "}
+                            <span className="font-mono">
+                              [
+                              {sol.map((v, i) => (
+                                <span
+                                  key={i}
+                                  className={v ? "text-emerald-600 font-semibold" : "text-slate-500"}
+                                >
+                                  {v ? "true" : "false"}
+                                  {i < sol.length - 1 ? ", " : ""}
+                                </span>
+                              ))}
+                              ]
+                            </span>
                           </div>
 
+                          {/* Print values and sum */}
                           <div className="text-xs text-slate-600">
                             Values:{" "}
-                            <span className="font-mono font-medium text-emerald-600">
+                            <span className="font-mono font-medium text-yellow-600">
                               {values.join(" + ")} = {values.reduce((a, b) => a + b, 0)}
                             </span>
                           </div>
