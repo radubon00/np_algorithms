@@ -208,7 +208,7 @@ const handleClearItems = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="flex-1 flex flex-col gap-4">
+              className="flex-1 flex flex-col gap-4 overflow-y-auto ">
                 {/* Header / stats */}
                 <header className="text-sm text-slate-700">
                   <h2 className="text-xl font-semibold text-slate-900 mb-1">
