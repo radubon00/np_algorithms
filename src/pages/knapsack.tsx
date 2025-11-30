@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Navbar from "../components/navbar.tsx";
 import { heuristicKnapsack, type KnapsackItem } from "../algorithms/knapsack";
+import { motion, AnimatePresence } from "framer-motion";
 
 type KnapsackResult = {
   selectedItems: { name: string; weight: number; value: number }[];
@@ -225,12 +226,25 @@ const handleClearItems = () => {
         {/* === RIGHT VISUALIZATION PANEL === */}
         <section className="hidden md:flex flex-1 items-center justify-center">
           <div className="w-full h-[480px] rounded-3xl border border-slate-200 bg-white shadow-sm px-8 py-6 flex flex-col gap-4">
+          <AnimatePresence mode="wait">
             {!result ? (
-              <div className="flex-1 flex items-center justify-center text-sm text-slate-500 text-center">
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="flex-1 flex items-center justify-center text-sm text-slate-500 text-center">
                 Run the algorithm to see the knapsack visualization.
-              </div>
+              </motion.div>
             ) : (
-              <>
+              <motion.div
+              key="result"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="flex-1 flex flex-col gap-4">
                 {/* Header / stats */}
                 <header className="text-sm text-slate-700">
                   <h2 className="text-xl font-semibold text-slate-900 mb-1">
@@ -292,33 +306,41 @@ const handleClearItems = () => {
                           <div className="absolute inset-0 flex flex-col">
                             {/* Empty / free space */}
                             {result.remainingCapacity > 0 && (
-                              <div
-                                className="w-full bg-slate-200/80 border-t border-slate-300 flex items-center justify-center text-sm font-medium text-slate-700"
+                              <motion.div
+                                key="empty-space"
+                                initial={{ scaleY: 0 }}
+                                animate={{ scaleY: 1 }}
+                                transition={{ duration: 0.4 }}
                                 style={{
                                   height: `${
                                     (result.remainingCapacity / capacityTotal) * 100
-                                  }%`,
+                                  }%`,transformOrigin: "top"
                                 }}
+                                className="w-full bg-slate-200/80 border-t border-slate-300 flex items-center justify-center text-sm font-medium text-slate-700"
                               >
                                 Empty
-                              </div>
+                              </motion.div>
                             )}
 
                             {/* Item segments */}
                             {itemsSorted.map((item, idx) => (
-                              <div
+                              <motion.div
                                 key={`${item.name}-${idx}`}  // ✅ use name+index instead of item.id
-                                className="w-full border-t border-white/40 flex items-center justify-center text-xl font-semibold text-white"
+                                initial={{ scaleY: 0 }}
+                                animate={{ scaleY: 1 }}
+                                transition={{ duration: 0.4, delay: 0.05 * idx }}
                                 style={{
                                   height: `${
                                     (item.weight / capacityTotal) * 100
                                   }%`,
                                   backgroundColor:
                                     SEGMENT_COLORS[idx % SEGMENT_COLORS.length],
+                                    transformOrigin: "bottom"
                                 }}
+                                className="w-full border-t border-white/40 flex items-center justify-center text-xl font-semibold text-white"
                               >
                                 {item.name}
-                              </div>
+                              </motion.div>
                             ))}
                           </div>
                         </div>
@@ -338,16 +360,19 @@ const handleClearItems = () => {
                             No items selected.
                           </span>
                         ) : (
-                          result.selectedItems.map((it) => (
-                            <span
+                          result.selectedItems.map((it, idx) => (
+                            <motion.span
                               key={it.name}
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.25, delay: 0.05 * idx }}
                               className="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs"
                             >
                               <span className="font-semibold mr-1">{it.name}</span>
                               <span className="text-slate-600">
                                 w:{it.weight} · v:{it.value}
                               </span>
-                            </span>
+                            </motion.span>
                           ))
                         )}
                       </div>
@@ -390,8 +415,9 @@ const handleClearItems = () => {
                     </div>
                   </div>
                 </div>
-              </>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         </section>
       </main>
