@@ -1,5 +1,6 @@
 import Navbar from "../components/navbar.tsx";
 import knapsackImg from "../assets/knapsack icon.png";
+import subsetImg from "../assets/subset icon.png";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
@@ -45,15 +46,19 @@ export default function HomePage() {
             </div>
 
             {/* Card 2: Recursion Tree */}
-            <div className="rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+            <div onClick={() => navigate("/subset-sum")} className="cursor-pointer hover:shadow-md hover:-translate-y-0.5 rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden">
               <div className="h-40 w-full bg-slate-100 flex items-center justify-center text-xs text-slate-500">
-                Recursion tree image placeholder
+                <img
+                  src={subsetImg}
+                  alt="Knapsack"
+                  className="h-full w-auto object-contain p-4"
+                />
               </div>
               <div className="p-6">
-                <h2 className="text-lg font-semibold mb-2">Recursion Tree</h2>
+                <h2 className="text-lg font-semibold mb-2">Subset Sum</h2>
                 <p className="text-sm text-slate-600">
-                  Understand recursive algorithms by visualizing how function
-                  calls expand into a tree.
+                  Visualize the recursive tree structure of the Subset Sum
+                  problem to understand its decision-making process.
                 </p>
               </div>
             </div>
