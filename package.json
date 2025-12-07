@@ -7,7 +7,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "bench:knapsack": "ts-node bench_tests/bench_knapsack.ts"
+    "bench:knapsack": "ts-node bench_tests/bench_knapsack.ts",
+    "bench:subset": "ts-node bench_tests/bench_subset.ts"
   },
   "dependencies": {
     "framer-motion": "^12.23.24",

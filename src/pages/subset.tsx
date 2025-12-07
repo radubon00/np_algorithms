@@ -3,6 +3,7 @@ import { useState } from "react";
 import Navbar from "../components/navbar.tsx";
 import { subsetSum , findSubset ,type SubsetTree, type SubsetItem } from "../algorithms/subset";
 import { motion, AnimatePresence } from "framer-motion";
+import { isSubsetSum } from "../algorithms/subsetDpComm";
 
 type SubsetResult = {
   solutions: boolean[][];
@@ -44,7 +45,6 @@ export default function SubsetPage() {
     setResult({ solutions: subsets, tree });
     console.log("Subsets found: ", subsets);
   };
-
 
   const handleAddItem = () => {
     const value = Number(valueInput);
