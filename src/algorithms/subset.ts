@@ -101,5 +101,5 @@ export function isSubsetSum(items: number[], target: number) : boolean{
 
     const tree : SubsetTree = { root: {index: 0, currentSum: 0, accomplice: target === 0}, target };
 
-    return buildTree(tree.root, items, target);;
+    return buildTree(tree.root, items, target);
 }
