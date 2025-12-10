@@ -25,6 +25,15 @@ export function heuristicKnapsack(
 
   const working = items.filter((it) => it.weight <= capacity);
 
+  if (working.length === 0) {
+    return {
+      selectedItems: [],
+      totalValue: 0,
+      remainingCapacity: capacity,
+      alphaUsed: null,
+    };
+  }
+
   for (const item of working) {
     const w = item.weight;
     const v = item.value;
@@ -33,15 +42,6 @@ export function heuristicKnapsack(
     if (w > maxW) maxW = w;
     if (v < minV) minV = v;
     if (v > maxV) maxV = v;
-  }
-
-  if (working.length === 0) {
-    return {
-      selectedItems: [],
-      totalValue: 0,
-      remainingCapacity: capacity,
-      alphaUsed: null,
-    };
   }
 
   // 2) Normalize weight and value
