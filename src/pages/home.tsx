@@ -34,11 +34,11 @@ export default function HomePage() {
             <div
             onClick={() => navigate("/tsp")} 
             className="rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-              <div className="h-40 w-full bg-slate-100 flex items-center justify-center text-xs text-slate-500">
+              <div className="h-40 w-full bg-slate-100 flex items-center justify-center text-xs text-slate-500 ">
                 <img
                   src={tspImg}
                   alt="Pathfinder"
-                  className="w-full h-full"
+                  className="h-auto w-full block"
                 />
               </div>
               <div className="p-6">
