@@ -40,3 +40,5 @@ dist/
 
 # Typescript build cache
 *.tsbuildinfo
+
+.env

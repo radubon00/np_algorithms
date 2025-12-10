@@ -1,6 +1,7 @@
 import Navbar from "../components/navbar.tsx";
 import knapsackImg from "../assets/knapsack icon.png";
 import subsetImg from "../assets/subset icon.png";
+import tspImg from "../assets/tsp1.png";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
@@ -12,7 +13,6 @@ export default function HomePage() {
 
       {/* Main content */}
       <main className="mx-auto max-w-6xl px-4 py-10">
-        
         {/* Hero section */}
         <section className="grid gap-10 md:grid-cols-[2fr,1fr] items-center mb-12">
           <div>
@@ -21,7 +21,7 @@ export default function HomePage() {
             </h1>
             <p className="text-lg text-slate-600 max-w-xl">
               Explore algorithms with step-by-step visualizations, simplifying
-              the learning process and making it more engaging for a better 
+              the learning process and making it more engaging for a better
               understanding.
             </p>
           </div>
@@ -30,23 +30,31 @@ export default function HomePage() {
         {/* Cards section */}
         <section>
           <div className="grid gap-6 md:grid-cols-3">
-
             {/* Card 1: Pathfinder */}
-            <div className="rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+            <div
+            onClick={() => navigate("/tsp")} 
+            className="rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden">
               <div className="h-40 w-full bg-slate-100 flex items-center justify-center text-xs text-slate-500">
-                Pathfinder image placeholder
+                <img
+                  src={tspImg}
+                  alt="Pathfinder"
+                  className="w-full h-full"
+                />
               </div>
               <div className="p-6">
-                <h2 className="text-lg font-semibold mb-2">Pathfinder</h2>
+                <h2 className="text-lg font-semibold mb-2">Travelling Salesman Problem</h2>
                 <p className="text-sm text-slate-600">
-                  Visualize graph algorithms like Dijkstra, BFS and DFS on
-                  interactive graphs.
+                  Visualize the process of finding the shortest possible route
+                  that visits each city and returns to the origin city.
                 </p>
               </div>
             </div>
 
             {/* Card 2: Recursion Tree */}
-            <div onClick={() => navigate("/subset-sum")} className="cursor-pointer hover:shadow-md hover:-translate-y-0.5 rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+            <div
+              onClick={() => navigate("/subset-sum")}
+              className="cursor-pointer hover:shadow-md hover:-translate-y-0.5 rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+            >
               <div className="h-40 w-full bg-slate-100 flex items-center justify-center text-xs text-slate-500">
                 <img
                   src={subsetImg}
@@ -81,12 +89,11 @@ export default function HomePage() {
                 </h2>
                 <p className="text-sm text-slate-600">
                   Explore how different strategies solve the 0/1 knapsack
-                  problem using heuristics, dynamic programming, and visual 
+                  problem using heuristics, dynamic programming, and visual
                   step-by-step comparisons.
                 </p>
               </div>
             </div>
-
           </div>
         </section>
       </main>
