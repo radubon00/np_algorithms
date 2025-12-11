@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "bench:knapsack": "ts-node bench_tests/bench_knapsack.ts",
-    "bench:subset": "ts-node bench_tests/bench_subset.ts"
+    "bench:subset": "ts-node bench_tests/bench_subset.ts",
+    "bench:tsp": "ts-node bench_tests/bench_tsp.ts"
   },
   "dependencies": {
     "@vis.gl/react-google-maps": "^1.7.1",
