@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Navbar from "../components/navbar.tsx";
 import { heuristicKnapsack, type KnapsackItem } from "../algorithms/knapsack";
+import { knapsackDP } from "../algorithms/knapsackDP";
 import { motion, AnimatePresence } from "framer-motion";
 
 type KnapsackResult = {
@@ -48,22 +49,31 @@ export default function KnapsackPage() {
   const [valueInput, setValueInput] = useState("");
   const [capacity, setCapacity] = useState("");
   const [result, setResult] = useState<KnapsackResult | null>(null);
+  const [algoType, setAlgoType] = useState<"heuristic" | "dp">("heuristic");
   const nextName = getNextName(items);
-
 
 const handleRunAlgorithm = () => {
   const cap = Number(capacity);
   if (!cap || cap <= 0 || items.length === 0) return;
 
-    // strip `id` before passing to the algorithm (it doesn’t care)
-    const algoItems: KnapsackItem[] = items.map(({ id, ...rest }) => rest);
-    const algoResult = heuristicKnapsack(algoItems, cap);
+  const algoItems: KnapsackItem[] = items.map(({ id, ...rest }) => rest);
 
+  let algoResult: KnapsackResult;
+
+  if (algoType === "heuristic") {
+    algoResult = heuristicKnapsack(algoItems, cap);
+  } else {
+    // DP version – assume it returns the same shape but without alphaUsed
+    const dpResult = knapsackDP(algoItems, cap);
+    algoResult = {
+      ...dpResult,
+      alphaUsed: null, // DP has no alpha
+    };
+  }
 
   setResult(algoResult);
 
-  // still log to console if you want
-  console.log("Best knapsack:", algoResult.selectedItems);
+  console.log(`[${algoType}] Best knapsack:`, algoResult.selectedItems);
   console.log("Total value:", algoResult.totalValue);
   console.log("Remaining capacity:", algoResult.remainingCapacity);
   console.log("Alpha used:", algoResult.alphaUsed);
@@ -114,7 +124,24 @@ const handleClearItems = () => {
           <h1 className="text-3xl font-bold tracking-tight mb-2">
             Knapsack Settings
           </h1>
-
+            {/* Algorithm selector (dropdown) */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Algorithm
+              </label>
+              <select
+                value={algoType}
+                onChange={(e) =>
+                  setAlgoType(e.target.value as "heuristic" | "dp")
+                }
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm
+                          bg-white text-slate-800 shadow-sm
+                          focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              >
+                <option value="heuristic">Heuristic</option>
+                <option value="dp">Dynamic programming</option>
+              </select>
+            </div>
           {/* Add item */}
           <div>
             <div className="text-sm font-medium text-slate-600 mb-1">
@@ -199,20 +226,22 @@ const handleClearItems = () => {
               </ul>
             )}
           </div>
-
           {/* Capacity + run */}
-          <div className="mt-2">
-            <label className="block text-sm font-medium text-slate-600 mb-1">
-              Knapsack capacity
-            </label>
-            <input
-              type="number"
-              min={1}
-              value={capacity}
-              onChange={(e) => setCapacity(e.target.value)}
-              placeholder="e.g. 50"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent mb-3"
-            />
+          <div className="mt-2 space-y-4">
+            {/* Capacity input */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Knapsack capacity
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={capacity}
+                onChange={(e) => setCapacity(e.target.value)}
+                placeholder="e.g. 50"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              />
+            </div>
 
             <button
               onClick={handleRunAlgorithm}
@@ -222,6 +251,7 @@ const handleClearItems = () => {
               Run algorithm
             </button>
           </div>
+
         </section>
         {/* === RIGHT VISUALIZATION PANEL === */}
         <section className="hidden md:flex flex-1 items-center justify-center">

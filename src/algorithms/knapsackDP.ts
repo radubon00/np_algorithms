@@ -7,6 +7,7 @@ export type KnapsackItem = {
 export type DPResult = {
   selectedItems: KnapsackItem[];
   totalValue: number;
+  remainingCapacity: number;
 };
 
 export function knapsackDP(items: KnapsackItem[], capacity: number): DPResult {
@@ -25,7 +26,7 @@ export function knapsackDP(items: KnapsackItem[], capacity: number): DPResult {
       if (weight <= w) {
         dp[i][w] = Math.max(
           value + dp[i - 1][w - weight], // include
-          dp[i - 1][w]                  // exclude
+          dp[i - 1][w]                    // exclude
         );
       } else {
         dp[i][w] = dp[i - 1][w];
@@ -33,24 +34,21 @@ export function knapsackDP(items: KnapsackItem[], capacity: number): DPResult {
     }
   }
 
-  // Total best value
   const totalValue = dp[n][capacity];
 
-  // ░░ BACKTRACK TO RECOVER WHICH ITEMS WERE SELECTED ░░
+  // Backtrack to recover which items were selected
   let w = capacity;
   const selectedItems: KnapsackItem[] = [];
 
   for (let i = n; i > 0 && w > 0; i--) {
-    // If the value comes from including this item
     if (dp[i][w] !== dp[i - 1][w]) {
       const item = items[i - 1];
       selectedItems.push(item);
-      w -= item.weight; // reduce capacity
+      w -= item.weight;
     }
   }
 
-  // Reverse to preserve original order (optional)
-  selectedItems.reverse();
+  const remainingCapacity = w;
 
-  return { selectedItems, totalValue };
+  return { selectedItems, totalValue, remainingCapacity };
 }

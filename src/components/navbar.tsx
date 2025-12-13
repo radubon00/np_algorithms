@@ -23,6 +23,11 @@ export default function Navbar() {
           <Link className="hover:text-slate-900 transition-colors" to="/subset-sum">
             Subset Sum
           </Link>
+          
+          <Link className="hover:text-slate-900 transition-colors" to="/tsp">
+            Traveling Salesman
+          </Link>
+
         </nav>
 
       </div>
